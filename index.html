@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ToolKit</title>
+<title>Tool Board</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,14 @@ body {
   font-size: 15px;
 }
 
-/* Accent Update Button */
+/* Update Button & Timestamp Container */
+.update-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
 .update-btn {
   background: #b53836; /* Soft, muted red */
   color: #ffffff;
@@ -73,6 +80,11 @@ body {
 
 .update-btn:active {
   transform: translateY(0);
+}
+
+.last-updated-text {
+  color: #a1a1aa; /* Gray color */
+  font-size: 12px; /* Smaller font size */
 }
 
 .section {
@@ -179,6 +191,10 @@ body {
     flex-direction: column;
     align-items: flex-start;
   }
+  .update-container {
+    align-items: flex-start;
+    margin-top: 10px;
+  }
 }
 </style>
 </head>
@@ -188,19 +204,23 @@ body {
 <div class="container">
   <div class="header">
     <div class="header-text">
-      <h1>ToolKit</h1>
-      <p>Here is all toolkit for help</p>
+      <h1>Tool Board</h1>
+      <p>Welcome to your Web Tools control center</p>
     </div>
-    <button class="update-btn" onclick="fetchAndCacheData()">Update Tools</button>
+    
+    <!-- New Container for Button and Timestamp -->
+    <div class="update-container">
+      <button class="update-btn" onclick="fetchAndCacheData()">Update Tools</button>
+      <div id="last-updated" class="last-updated-text"></div>
+    </div>
   </div>
 
   <div id="dashboard">
-    <div class="status-msg">Loading kit...</div>
+    <div class="status-msg">Loading tools...</div>
   </div>
 </div>
 
 <script>
-// Default icon color updated to match the #b53836 accent
 const defaultIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24">
   <path stroke="#b53836" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -214,6 +234,7 @@ const repo = repoMatch ? repoMatch[1] : "";
 
 let branch = "main", baseAPI = "";
 const CACHE_KEY = "toolBoardData_v1";
+const CACHE_TIME_KEY = "toolBoardTime_v1"; // New key for the timestamp
 
 function escapeHtml(str) {
   return str.replace(/[&<>'"]/g, 
@@ -221,9 +242,15 @@ function escapeHtml(str) {
   );
 }
 
-// Opens the tool link in a new tab (Change 2)
 function openTool(category, tool) {
   window.open("tools/" + category + "/" + tool + "/", "_blank");
+}
+
+function updateLastUpdatedText(timeString) {
+  const timeElement = document.getElementById("last-updated");
+  if (timeElement && timeString) {
+    timeElement.innerText = "Last updated: " + timeString;
+  }
 }
 
 async function detectBranch() {
@@ -266,15 +293,20 @@ async function fetchToolData(categoryName, toolName, index) {
   }
 }
 
-// Fetches the data from Github API and saves it locally (Change 1)
 async function fetchAndCacheData() {
   const dashboard = document.getElementById("dashboard");
-  dashboard.innerHTML = "<div class='status-msg'>Fetching latest tools from server...</div>";
+  const updateBtn = document.querySelector(".update-btn");
+  
+  // Visual feedback during loading
+  updateBtn.innerText = "Updating...";
+  updateBtn.disabled = true;
   
   const ok = await detectBranch();
   
   if (!ok) {
     dashboard.innerHTML = "<div class='status-msg'>❌ 'tools' folder not found</div>";
+    updateBtn.innerText = "Update Tools";
+    updateBtn.disabled = false;
     return;
   }
 
@@ -289,6 +321,8 @@ async function fetchAndCacheData() {
 
     if (categoryFolders.length === 0) {
       dashboard.innerHTML = "<div class='status-msg'>No folders starting with 'toolfolder' found in /tools directory.</div>";
+      updateBtn.innerText = "Update Tools";
+      updateBtn.disabled = false;
       return;
     }
 
@@ -339,28 +373,42 @@ async function fetchAndCacheData() {
 
     const finalHtml = htmlOutput || "<div class='status-msg'>No tools found.</div>";
     
+    // Generate Current Timestamp
+    const currentTime = new Date().toLocaleString();
+
     // Save to local storage
     localStorage.setItem(CACHE_KEY, finalHtml);
+    localStorage.setItem(CACHE_TIME_KEY, currentTime);
+    
+    // Update DOM
     dashboard.innerHTML = finalHtml;
+    updateLastUpdatedText(currentTime);
     
   } catch (err) {
     console.error(err);
     dashboard.innerHTML = "<div class='status-msg'>❌ Error fetching directory data</div>";
+  } finally {
+    // Restore button state
+    updateBtn.innerText = "Update Tools";
+    updateBtn.disabled = false;
   }
 }
 
-// Initializer function to check cache first (Change 1)
 function initDashboard() {
   const cachedData = localStorage.getItem(CACHE_KEY);
+  const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+
   if (cachedData) {
     document.getElementById("dashboard").innerHTML = cachedData;
+    if (cachedTime) {
+      updateLastUpdatedText(cachedTime);
+    }
   } else {
     // If no cache, fetch from API
     fetchAndCacheData();
   }
 }
 
-// Run on load
 initDashboard();
 </script>
 
