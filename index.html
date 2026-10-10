@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToolKit</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Notch:wght@200..700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="https://codeby-ayu.github.io/helper/favicon.png">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Stack Sans Notch", system-ui, -apple-system, sans-serif;
+  background: #18181b; /* Deep matte dark grey */
+  color: #fff;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header & Nav Styling */
+.header {
+  padding: 20px 0 30px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-text h1 {
+  color: #ffffff; /* Pure white */
+  font-size: clamp(26px, 5vw, 36px);
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.header-text p {
+  color: #a1a1aa; /* Light grey */
+  margin: 0;
+  font-size: 15px;
+}
+
+/* Accent Update Button */
+.update-btn {
+  background: #b53836; /* Soft, muted red */
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(181, 56, 54, 0.2);
+}
+
+.update-btn:hover {
+  background: #ca3e3c;
+  box-shadow: 0 4px 15px rgba(181, 56, 54, 0.4);
+  transform: translateY(-2px);
+}
+
+.update-btn:active {
+  transform: translateY(0);
+}
+
+.section {
+  margin-bottom: 45px;
+}
+
+.section-title {
+  color: #ffffff;
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: 700;
+  margin: 0 0 18px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2d2d2f; /* Very subtle faint border */
+  letter-spacing: 0.5px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Cards & Containers */
+.card {
+  background: linear-gradient(145deg, #18181c, #26262a); /* Lighter dark grey */
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  width: 100%;
+  border: 1px solid #2d2d2f; /* Very subtle faint border */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #b53836;
+  box-shadow: 0 8px 25px rgba(181, 56, 54, 0.25); /* Subtle red glow/drop-shadow */
+}
+
+.index {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  color: #b53836; /* Accent muted red */
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  background: #1a1a1e;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+  border: 1px solid #2d2d2f;
+}
+
+.iconBox img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  /* Hex #b53836 to CSS filter */
+  filter: brightness(0) saturate(100%) invert(29%) sepia(50%) saturate(2978%) hue-rotate(337deg) brightness(92%) contrast(93%);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.about {
+  color: #a1a1aa; /* Light grey */
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.status-msg {
+  color: #a1a1aa;
+  font-size: 16px;
+  padding: 20px 0;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  body {
+    padding: 15px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-text">
+      <h1>ToolKit</h1>
+      <p>Here is all toolkit for help</p>
+    </div>
+    <button class="update-btn" onclick="fetchAndCacheData()">Update Tools</button>
+  </div>
+
+  <div id="dashboard">
+    <div class="status-msg">Loading kit...</div>
+  </div>
+</div>
+
+<script>
+// Default icon color updated to match the #b53836 accent
+const defaultIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24">
+  <path stroke="#b53836" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+    d="M10 3v4a1 1 0 0 1-1 1H5m4 10v-2m3 2v-6m3 6v-3m4-11v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z"/>
+</svg>`;
+
+const host = location.hostname;
+const user = host.replace(".github.io", "");
+const repoMatch = window.location.pathname.match(/^\/([^/]+)/);
+const repo = repoMatch ? repoMatch[1] : "";
+
+let branch = "main", baseAPI = "";
+const CACHE_KEY = "toolBoardData_v1";
+
+function escapeHtml(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
+}
+
+// Opens the tool link in a new tab (Change 2)
+function openTool(category, tool) {
+  window.open("tools/" + category + "/" + tool + "/", "_blank");
+}
+
+async function detectBranch() {
+  for (const b of ["main", "master"]) {
+    const r = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/tools?ref=${b}`);
+    if (r.ok) {
+      branch = b;
+      baseAPI = `https://api.github.com/repos/${user}/${repo}/contents/tools?ref=${b}`;
+      return true;
+    }
+  }
+  return false;
+}
+
+async function fetchToolData(categoryName, toolName, index) {
+  const descURL = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/tools/${categoryName}/${toolName}/description.json`;
+  const iconURL = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/tools/${categoryName}/${toolName}/icon.svg`;
+
+  try {
+    const [descRes, iconRes] = await Promise.all([
+      fetch(descURL).then(res => res.ok ? res.json() : {}).catch(() => ({})),
+      fetch(iconURL, { method: "HEAD" }).catch(() => ({ ok: false }))
+    ]);
+
+    const iconHtml = iconRes.ok ? `<img src="${iconURL}" alt="">` : defaultIcon;
+    const title = descRes.title || toolName;
+    const about = descRes.about || "No description available.";
+
+    return `
+      <div class="card" onclick="openTool('${categoryName}', '${toolName}')">
+        <div class="index">#${index}</div>
+        <div class="iconBox">${iconHtml}</div>
+        <div class="title">${escapeHtml(title)}</div>
+        <div class="about">${escapeHtml(about)}</div>
+      </div>
+    `;
+  } catch (error) {
+    console.error(`Error loading tool ${toolName}:`, error);
+    return "";
+  }
+}
+
+// Fetches the data from Github API and saves it locally (Change 1)
+async function fetchAndCacheData() {
+  const dashboard = document.getElementById("dashboard");
+  dashboard.innerHTML = "<div class='status-msg'>Fetching latest tools from server...</div>";
+  
+  const ok = await detectBranch();
+  
+  if (!ok) {
+    dashboard.innerHTML = "<div class='status-msg'>❌ 'tools' folder not found</div>";
+    return;
+  }
+
+  try {
+    const res = await fetch(baseAPI);
+    if (!res.ok) throw new Error("API request failed");
+    const contents = await res.json();
+
+    const categoryFolders = contents
+      .filter(f => f.type === "dir" && f.name.startsWith("toolfolder"))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    if (categoryFolders.length === 0) {
+      dashboard.innerHTML = "<div class='status-msg'>No folders starting with 'toolfolder' found in /tools directory.</div>";
+      return;
+    }
+
+    let globalIndex = 1;
+    let htmlOutput = "";
+
+    for (const catFolder of categoryFolders) {
+      const catApiUrl = `https://api.github.com/repos/${user}/${repo}/contents/tools/${catFolder.name}?ref=${branch}`;
+      const catRes = await fetch(catApiUrl);
+      if (!catRes.ok) continue;
+      const catContents = await catRes.json();
+
+      let headingText = catFolder.name.replace(/^toolfolder_/, "").replace(/_/g, " ").toUpperCase();
+      try {
+        const txtUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/tools/${catFolder.name}/0.txt`;
+        const txtRes = await fetch(txtUrl);
+        if (txtRes.ok) {
+          const txtVal = await txtRes.text();
+          if (txtVal.trim()) headingText = txtVal.trim();
+        }
+      } catch (e) {}
+
+      const toolFolders = catContents
+        .filter(f => f.type === "dir")
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      if (toolFolders.length === 0) continue;
+
+      const cardPromises = toolFolders.map(tool => {
+        const currentIndex = globalIndex++;
+        return fetchToolData(catFolder.name, tool.name, currentIndex);
+      });
+
+      const cards = await Promise.all(cardPromises);
+      const validCards = cards.filter(c => c !== "");
+
+      if (validCards.length > 0) {
+        htmlOutput += `
+          <div class="section">
+            <h2 class="section-title">${escapeHtml(headingText)}</h2>
+            <div class="grid">
+              ${validCards.join("")}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    const finalHtml = htmlOutput || "<div class='status-msg'>No tools found.</div>";
+    
+    // Save to local storage
+    localStorage.setItem(CACHE_KEY, finalHtml);
+    dashboard.innerHTML = finalHtml;
+    
+  } catch (err) {
+    console.error(err);
+    dashboard.innerHTML = "<div class='status-msg'>❌ Error fetching directory data</div>";
+  }
+}
+
+// Initializer function to check cache first (Change 1)
+function initDashboard() {
+  const cachedData = localStorage.getItem(CACHE_KEY);
+  if (cachedData) {
+    document.getElementById("dashboard").innerHTML = cachedData;
+  } else {
+    // If no cache, fetch from API
+    fetchAndCacheData();
+  }
+}
+
+// Run on load
+initDashboard();
+</script>
+
+</body>
+</html>
